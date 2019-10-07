@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -58,16 +59,19 @@ public class TraversalService {
 			IOUtils.closeQuietly(reader);
 		}
 
+		System.out.println("read " + routedRequests.size() + " requests");
 		return routedRequests;
 	}
 
 	public void traverseRequests(List<TraverseRequest> routedRequests) throws IOException {
 		HttpContext localContext = new BasicHttpContext();
 		HttpClient httpClient = new DefaultHttpClient();
+		httpClient.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true); 
 
 		for (TraverseRequest request : routedRequests) {
 			RouterUtil.routeUrlViaClient(localContext, httpClient, request);
 		}
+		System.out.println("");
 	}
 
 	public void writeRequests(Path pathOutput, List<TraverseRequest> traverseRequests) throws IOException {
