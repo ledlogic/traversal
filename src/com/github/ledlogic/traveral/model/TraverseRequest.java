@@ -5,15 +5,22 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class RoutedRequest implements Serializable {
+public class TraverseRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String entity;
+	// input
+	private String initalUrl;
+	private String targetUrl;
+
+	// output
 	private String resultUrl;
 	private int statusCode;
+	private String entity;
+	private boolean matched;
+	private String exceptionMessage;
 	
-	public RoutedRequest() {
+	public TraverseRequest() {
 	}
 	
 	public void setEntity(String entity) {
@@ -40,9 +47,41 @@ public class RoutedRequest implements Serializable {
 		this.statusCode = statusCode;
 	}
 	
+	public String getInitalUrl() {
+		return initalUrl;
+	}
+
+	public void setInitalUrl(String initalUrl) {
+		this.initalUrl = initalUrl;
+	}
+
+	public String getTargetUrl() {
+		return targetUrl;
+	}
+
+	public void setTargetUrl(String targetUrl) {
+		this.targetUrl = targetUrl;
+	}
+
+	public boolean isMatched() {
+		return matched;
+	}
+
+	public void setMatched(boolean matched) {
+		this.matched = matched;
+	}
+
+	public String getExceptionMessage() {
+		return exceptionMessage;
+	}
+
+	public void setExceptionMessage(String exceptionMessage) {
+		this.exceptionMessage = exceptionMessage;
+	}
+
 	@Override
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
-	
+
 }

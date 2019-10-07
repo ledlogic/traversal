@@ -15,29 +15,12 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
 
-import com.github.ledlogic.traveral.model.RoutedRequest;
+import com.github.ledlogic.traveral.model.TraverseRequest;
 
 public class RouterUtil {
 	
 	private RouterUtil() {
 		// static-only
-	}
-	
-	public static RoutedRequest routeUrlViaClient(HttpContext localContext, HttpClient httpClient, String routerUrl, String targetUrl) throws IOException, ClientProtocolException {
-		HttpGet routerGet = new HttpGet(routerUrl);
-		HttpResponse customerResponse = httpClient.execute(routerGet, localContext);
-		HttpHost target = (HttpHost) localContext.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
-		HttpUriRequest customerRequest = (HttpUriRequest) localContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
-		String customerResultUrl = filterUrl(localContext);
-		HttpEntity entity = customerResponse.getEntity();
-		StatusLine statusLine = customerResponse.getStatusLine();
-		int statusCode = statusLine.getStatusCode();
-		
-		RoutedRequest ret = new RoutedRequest();
-		ret.setResultUrl(customerResultUrl);
-		ret.setEntity(EntityUtils.toString(entity));
-		ret.setStatusCode(statusCode);
-		return ret;
 	}
 	
 	public static String filterUrl(HttpContext localContext) {
@@ -59,6 +42,30 @@ public class RouterUtil {
 			url = StringUtils.substring(url, 0, url.length() - 1);
 		}
 		return url;
+	}
+
+	public static void routeUrlViaClient(HttpContext localContext, HttpClient httpClient, TraverseRequest request) {
+		try {
+			String routerUrl = request.getInitalUrl();
+			String targetUrl = request.getTargetUrl();
+			
+			HttpGet routerGet = new HttpGet(routerUrl);
+			HttpResponse customerResponse = httpClient.execute(routerGet, localContext);
+			HttpHost target = (HttpHost) localContext.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
+			HttpUriRequest customerRequest = (HttpUriRequest) localContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
+			String customerResultUrl = filterUrl(localContext);
+			HttpEntity entity = customerResponse.getEntity();
+			StatusLine statusLine = customerResponse.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			boolean matched = StringUtils.equals(targetUrl, customerResultUrl);
+			
+			request.setResultUrl(customerResultUrl);
+			request.setEntity(EntityUtils.toString(entity));
+			request.setStatusCode(statusCode);
+			request.setMatched(matched);
+		} catch (Exception e) {
+			request.setExceptionMessage(e.getMessage());
+		}
 	}
 
 }
