@@ -1,13 +1,10 @@
 package com.github.ledlogic.traveral.util;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -46,21 +43,22 @@ public class RouterUtil {
 
 	public static void routeUrlViaClient(HttpContext localContext, HttpClient httpClient, TraverseRequest request) {
 		try {
-			String routerUrl = request.getInitalUrl();
+			// load initial settings
+			String routerUrl = request.getInitialUrl();
 			String targetUrl = request.getTargetUrl();
 			
+			// execute get against request url
 			HttpGet routerGet = new HttpGet(routerUrl);
 			HttpResponse customerResponse = httpClient.execute(routerGet, localContext);
-			HttpHost target = (HttpHost) localContext.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
-			HttpUriRequest customerRequest = (HttpUriRequest) localContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
 			String customerResultUrl = filterUrl(localContext);
-			HttpEntity entity = customerResponse.getEntity();
 			StatusLine statusLine = customerResponse.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 			boolean matched = StringUtils.equals(targetUrl, customerResultUrl);
-			
+			HttpEntity entity = customerResponse.getEntity();
+			EntityUtils.consumeQuietly(entity);
+
+			// update results
 			request.setResultUrl(customerResultUrl);
-			request.setEntity(EntityUtils.toString(entity));
 			request.setStatusCode(statusCode);
 			request.setMatched(matched);
 		} catch (Exception e) {

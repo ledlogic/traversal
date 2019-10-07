@@ -7,28 +7,44 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class TraverseRequest implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	
 	// input
-	private String initalUrl;
+	private String reason;
+	private String initialUrl;
 	private String targetUrl;
 
 	// output
 	private String resultUrl;
 	private int statusCode;
-	private String entity;
 	private boolean matched;
 	private String exceptionMessage;
 	
 	public TraverseRequest() {
 	}
 	
-	public void setEntity(String entity) {
-		this.entity = entity;
+	public String getReason() {
+		return reason;
 	}
-	
-	public String getEntity() {
-		return entity;
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getInitialUrl() {
+		return initialUrl;
+	}
+
+	public void setInitialUrl(String initialUrl) {
+		this.initialUrl = initialUrl;
+	}
+
+	public String getTargetUrl() {
+		return targetUrl;
+	}
+
+	public void setTargetUrl(String targetUrl) {
+		this.targetUrl = targetUrl;
 	}
 
 	public void setResultUrl(String resultUrl) {
@@ -47,22 +63,6 @@ public class TraverseRequest implements Serializable {
 		this.statusCode = statusCode;
 	}
 	
-	public String getInitalUrl() {
-		return initalUrl;
-	}
-
-	public void setInitalUrl(String initalUrl) {
-		this.initalUrl = initalUrl;
-	}
-
-	public String getTargetUrl() {
-		return targetUrl;
-	}
-
-	public void setTargetUrl(String targetUrl) {
-		this.targetUrl = targetUrl;
-	}
-
 	public boolean isMatched() {
 		return matched;
 	}
@@ -82,6 +82,32 @@ public class TraverseRequest implements Serializable {
 	@Override
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
+	public static String[] getWriteHeader() {
+		String[] ret = {
+			"reason",
+			"initialUrl",
+			"targetUrl",			
+			"resultUrl",
+			"statusCode",
+			"matched",
+			"exceptionMessage"
+		};
+		return ret;
+	}
+
+	public String[] getWriteData() {
+		String[] ret = {
+			reason,
+			initialUrl,
+			targetUrl,			
+			resultUrl,
+			Integer.toString(statusCode),
+			Boolean.toString(matched),
+			exceptionMessage,
+		};
+		return ret;
 	}
 
 }
