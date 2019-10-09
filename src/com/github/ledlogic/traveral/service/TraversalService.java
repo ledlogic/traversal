@@ -124,7 +124,7 @@ public class TraversalService {
 			matches += traverseRequest.isMatched() ? 1 : 0;
 		}
 		int count = traverseRequests.size();
-		float pct = (matches / count) * 100.0f;
+		float pct = ((float)matches / (float)count) * 100.0f;
 		
 		String m = "matches/count: " + matches + "/" + count + " (" + pct + "%)";
 		System.out.println(m);
