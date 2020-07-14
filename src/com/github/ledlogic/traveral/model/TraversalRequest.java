@@ -5,9 +5,9 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class TraverseRequest implements Serializable {
+public class TraversalRequest implements Serializable {
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 1L;
 	
 	// input
 	private String reason;
@@ -20,7 +20,7 @@ public class TraverseRequest implements Serializable {
 	private boolean matched;
 	private String exceptionMessage;
 	
-	public TraverseRequest() {
+	public TraversalRequest() {
 	}
 	
 	public String getReason() {

@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import com.github.ledlogic.traveral.model.TraverseRequest;
+import com.github.ledlogic.traveral.model.TraversalRequest;
 import com.github.ledlogic.traveral.util.RouterUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -30,11 +31,11 @@ public class TraversalService {
 		return singleton;
 	}
 
-	public List<TraverseRequest> load(Path pathInput) throws IOException {
+	public List<TraversalRequest> load(Path pathInput) throws IOException {
 		System.out.println("reading file " + pathInput);
 		Reader reader = null;
 		CSVReader csvReader = null;
-		List<TraverseRequest> routedRequests = new ArrayList<TraverseRequest>();
+		List<TraversalRequest> routedRequests = new ArrayList<TraversalRequest>();
 		try {
 			reader = Files.newBufferedReader(pathInput);
 			csvReader = new CSVReaderBuilder(reader).withSkipLines(1).build();
@@ -46,7 +47,7 @@ public class TraversalService {
 				String reason = record[index++];
 				String initialUrl = record[index++];
 				String targetUrl = record[index++];
-				TraverseRequest request = new TraverseRequest();
+				TraversalRequest request = new TraversalRequest();
 				request.setReason(reason);
 				request.setInitialUrl(initialUrl);
 				request.setTargetUrl(targetUrl);
@@ -57,20 +58,25 @@ public class TraversalService {
 			IOUtils.closeQuietly(csvReader);
 			IOUtils.closeQuietly(reader);
 		}
+		
+		System.out.println("routedRequests size, " + CollectionUtils.size(routedRequests));
 
 		return routedRequests;
 	}
 
-	public void traverseRequests(List<TraverseRequest> routedRequests) throws IOException {
+	public void traverseRequests(List<TraversalRequest> routedRequests) throws IOException {
+		System.out.println("traversing requests");
 		HttpContext localContext = new BasicHttpContext();
 		HttpClient httpClient = new DefaultHttpClient();
 
-		for (TraverseRequest request : routedRequests) {
+		for (TraversalRequest request : routedRequests) {
+			System.out.print(".");
 			RouterUtil.routeUrlViaClient(localContext, httpClient, request);
 		}
+		System.out.println("");
 	}
 
-	public void writeRequests(Path pathOutput, List<TraverseRequest> traverseRequests) throws IOException {
+	public void writeRequests(Path pathOutput, List<TraversalRequest> traverseRequests) throws IOException {
 		System.out.println("writing file " + pathOutput);
 
 		Writer writer = null;
@@ -79,10 +85,10 @@ public class TraversalService {
 			writer = Files.newBufferedWriter(pathOutput);
 			csvWriter = new CSVWriter(writer);
 	
-			String[] header = TraverseRequest.getWriteHeader();
+			String[] header = TraversalRequest.getWriteHeader();
 			csvWriter.writeNext(header);
 	
-			for (TraverseRequest traverseRequest: traverseRequests) {
+			for (TraversalRequest traverseRequest: traverseRequests) {
 				String[] data = traverseRequest.getWriteData();
 				csvWriter.writeNext(data);
 			}
@@ -94,14 +100,14 @@ public class TraversalService {
 	
 	public void traverse(Path pathInput, Path pathOutput) throws IOException {
 		long t0 = System.currentTimeMillis();
-		System.out.println("traverse started, " + dateFormat(t0));
-		List<TraverseRequest> traverseRequests = load(pathInput);
+		System.out.println("started, " + dateFormat(t0));
+		List<TraversalRequest> traverseRequests = load(pathInput);
 		traverseRequests(traverseRequests);
 		writeRequests(pathOutput, traverseRequests);
 		displayMetrics(traverseRequests);
 		long t1 = System.currentTimeMillis();
 		
-		System.out.println("traverse finished, " + dateFormat(t1));
+		System.out.println("finished, " + dateFormat(t1));
 		System.out.println("completed in " + ((t1 - t0)/1000.0f) + "s");
 	}
 	
@@ -114,13 +120,13 @@ public class TraversalService {
 		return ret;
 	}
 
-	private void displayMetrics(List<TraverseRequest> traverseRequests) {
+	private void displayMetrics(List<TraversalRequest> traverseRequests) {
 		int matches = 0;
-		for (TraverseRequest traverseRequest: traverseRequests) {
+		for (TraversalRequest traverseRequest: traverseRequests) {
 			matches += traverseRequest.isMatched() ? 1 : 0;
 		}
 		int count = traverseRequests.size();
-		float pct = matches / count * 100.0f;
+		float pct = (float)matches / (float)count * 100.0f;
 		
 		String m = "matches/count: " + matches + "/" + count + " (" + pct + "%)";
 		System.out.println(m);

@@ -12,7 +12,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
 
-import com.github.ledlogic.traveral.model.TraverseRequest;
+import com.github.ledlogic.traveral.model.TraversalRequest;
 
 public class RouterUtil {
 	
@@ -41,7 +41,7 @@ public class RouterUtil {
 		return url;
 	}
 
-	public static void routeUrlViaClient(HttpContext localContext, HttpClient httpClient, TraverseRequest request) {
+	public static void routeUrlViaClient(HttpContext localContext, HttpClient httpClient, TraversalRequest request) {
 		try {
 			// load initial settings
 			String routerUrl = request.getInitialUrl();
