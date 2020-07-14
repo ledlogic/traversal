@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -61,6 +62,7 @@ public class TraversalService {
 		
 		System.out.println("routedRequests size, " + CollectionUtils.size(routedRequests));
 
+		System.out.println("read " + routedRequests.size() + " requests");
 		return routedRequests;
 	}
 
@@ -68,6 +70,7 @@ public class TraversalService {
 		System.out.println("traversing requests");
 		HttpContext localContext = new BasicHttpContext();
 		HttpClient httpClient = new DefaultHttpClient();
+		httpClient.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true); 
 
 		for (TraversalRequest request : routedRequests) {
 			System.out.print(".");
@@ -126,7 +129,7 @@ public class TraversalService {
 			matches += traverseRequest.isMatched() ? 1 : 0;
 		}
 		int count = traverseRequests.size();
-		float pct = (float)matches / (float)count * 100.0f;
+		float pct = ((float)matches / (float)count) * 100.0f;
 		
 		String m = "matches/count: " + matches + "/" + count + " (" + pct + "%)";
 		System.out.println(m);

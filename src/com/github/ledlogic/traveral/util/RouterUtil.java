@@ -11,11 +11,14 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.github.ledlogic.traveral.model.TraversalRequest;
 
 public class RouterUtil {
-	
+
+	private final static Logger LOG = Logger.getLogger(RouterUtil.class);
+
 	private RouterUtil() {
 		// static-only
 	}
@@ -61,7 +64,10 @@ public class RouterUtil {
 			request.setResultUrl(customerResultUrl);
 			request.setStatusCode(statusCode);
 			request.setMatched(matched);
+			System.out.print(".");
 		} catch (Exception e) {
+			LOG.warn("Could not perform route request[" + request + "]", e);
+			System.out.print("e");
 			request.setExceptionMessage(e.getMessage());
 		}
 	}
